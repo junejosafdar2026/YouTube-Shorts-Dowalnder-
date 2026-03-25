@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShortsDL - YouTube Shorts Downloader</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 2.5rem 2rem;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 550px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 2.2rem;
+            background: -webkit-linear-gradient(45deg, #ff00cc, #333399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
+
+        .logo p {
+            font-size: 0.9rem;
+            color: #b3b3b3;
+            margin-top: 5px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        input[type="url"] {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="url"]:focus {
+            border-color: #ff00cc;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        input[type="url"]::placeholder {
+            color: #888;
+        }
+
+        .btn-main {
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(45deg, #ff00cc, #333399);
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 0, 204, 0.3);
+        }
+
+        .btn-main:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 0, 204, 0.4);
+        }
+
+        .btn-main:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            background: #555;
+            box-shadow: none;
+        }
+
+        .error {
+            color: #ff4d4d;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .loader-container {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #ff00cc;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 15px;
+            color: #ccc;
+            font-size: 0.9rem;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .result-card {
+            display: none;
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .thumbnail {
+            width: 100%;
+            max-width: 250px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            aspect-ratio: 9/16;
+            object-fit: cover;
+        }
+
+        .video-title {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #eee;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .formats-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .format-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 18px;
+            border-radius: 25px;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .format-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #ff00cc;
+        }
+        
+        .format-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 2rem 1.5rem; }
+            .logo h1 { font-size: 1.8rem; }
+            .thumbnail { max-width: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo">
+            <h1>ShortsDL</h1>
+            <p>Download YouTube Shorts in High Quality</p>
+        </div>
+
+        <form id="dl-form">
+            <div class="input-wrapper">
+                <input type="url" id="url-input" placeholder="Paste YouTube Short URL here..." required autocomplete="off">
+            </div>
+            <button type="submit" id="submit-btn" class="btn-main">Get Download Links</button>
+            <div id="error-msg" class="error"></div>
+        </form>
+
+        <div id="loader" class="loader-container">
+            <div class="spinner"></div>
+            <div class="loading-text">Fetching video info...</div>
+        </div>
+
+        <div id="result" class="result-card">
+            <img id="thumb" class="thumbnail" src="" alt="Video Thumbnail">
+            <h3 id="video-title" class="video-title"></h3>
+            <div id="formats" class="formats-container">
+                <!-- Buttons will be injected here via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === CONFIGURATION ===
+        // Change API_BASE to your deployed backend URL when hosting on GitHub Pages
+        // Example: const API_BASE = 'https://my-backend-app.onrender.com';
+        const API_BASE = 'http://localhost:3000'; 
+        // =====================
+
+        const form = document.getElementById('dl-form');
+        const urlInput = document.getElementById('url-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const loader = document.getElementById('loader');
+        const resultCard = document.getElementById('result');
+        const errorMsg = document.getElementById('error-msg');
+        
+        const thumbImg = document.getElementById('thumb');
+        const videoTitle = document.getElementById('video-title');
+        const formatsContainer = document.getElementById('formats');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const url = urlInput.value.trim();
+
+            if (!url) return;
+
+            // Basic validation for youtube links
+            if (!/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/.+/.test(url)) {
+                showError('Please enter a valid YouTube URL.');
+                return;
+            }
+
+            // Reset UI
+            hideError();
+            resultCard.style.display = 'none';
+            submitBtn.disabled = true;
+            loader.style.display = 'block';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/info?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to fetch video information.');
+                }
+
+                displayResults(data, url);
+            } catch (err) {
+                showError(err.message || 'A network error occurred.');
+            } finally {
+                loader.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        });
+
+        function displayResults(data, originalUrl) {
+            thumbImg.src = data.thumbnail;
+            videoTitle.textContent = data.title;
+            formatsContainer.innerHTML = '';
+
+            if (data.formats && data.formats.length > 0) {
+                data.formats.forEach(format => {
+                    const btn = document.createElement('button');
+                    btn.className = 'format-btn';
+                    
+                    // Download icon SVG
+                    const icon = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
+                    
+                    btn.innerHTML = `${icon} ${format.resolution} (MP4)`;
+                    
+                    btn.onclick = () => {
+                        // Redirect to download API proxy
+                        window.location.href = `${API_BASE}/api/download?url=${encodeURIComponent(originalUrl)}&format=${format.format_id}`;
+                    };
+                    
+                    formatsContainer.appendChild(btn);
+                });
+            } else {
+                formatsContainer.innerHTML = '<p style="color: #ccc; font-size: 0.9rem;">No suitable formats found.</p>';
+            }
+
+            resultCard.style.display = 'block';
+        }
+
+        function showError(message) {
+            errorMsg.textContent = message;
+            errorMsg.style.display = 'block';
+        }
+
+        function hideError() {
+            errorMsg.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
+
+  
