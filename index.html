@@ -4,32 +4,34 @@
   <title>YouTube Shorts Downloader</title>
 </head>
 
-<body>
+<body style="text-align:center; margin-top:50px; font-family:Arial;">
 
-<div style="text-align:center; margin-top:50px;">
-  <h1>🎬 YouTube Shorts Downloader</h1>
+<h1>🎬 YouTube Shorts Downloader</h1>
 
-  <input type="text" id="videoUrl" placeholder="Paste YouTube Shorts link" style="width:300px; padding:10px;">
-  <br><br>
+<input type="text" id="videoUrl" placeholder="Paste YouTube Shorts link" style="width:300px; padding:10px;">
+<br><br>
 
-  <button onclick="downloadVideo()" style="padding:10px 20px;">Download</button>
+<button onclick="downloadVideo()" style="padding:10px 20px; cursor:pointer;">
+  Download
+</button>
 
-  <div id="result" style="margin-top:20px;"></div>
-</div>
+<p id="msg"></p>
 
 <script>
 function downloadVideo() {
   const url = document.getElementById("videoUrl").value;
 
   if (!url) {
-    alert("Paste link first!");
+    alert("Please paste a link first!");
     return;
   }
 
-  const api = "https://api.vevioz.com/api/button/mp4?url=" + url;
+  document.getElementById("msg").innerText = "Opening download page...";
 
-  document.getElementById("result").innerHTML =
-    '<iframe src="' + api + '" width="300" height="200" style="border:none;"></iframe>';
+  // This opens a real working downloader site
+  const finalUrl = "https://en.savefrom.net/1-youtube-video-downloader-533nN/?url=" + encodeURIComponent(url);
+
+  window.open(finalUrl, "_blank");
 }
 </script>
 
